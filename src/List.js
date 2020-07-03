@@ -13,7 +13,13 @@ class List extends Component {
   }
 
   renderItems(items) {
-    return items.map((item) => <li key={item.key}>{item.data}</li>);
+    return items.map((item) => (
+      <li key={item.key} className="ptm_list__item">
+        <button className="ptm_list__button">
+          {item.data}
+        </button>
+      </li>
+    ));
   }
 }
 
