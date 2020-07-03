@@ -3,7 +3,12 @@ import React, { Component } from "react";
 class List extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      selected: [],
+    };
     this.clickItemHandler = this.clickItemHandler.bind(this);
+    this.reciveSelectedItems = this.reciveSelectedItems.bind(this);
+    this.selectTo = this.selectTo.bind(this);
   }
   render() {
     const { items } = this.props;
@@ -21,7 +26,7 @@ class List extends Component {
       <li key={item.key} className="ptm_list__item">
         <button
           className="ptm_list__button"
-          onClick={() => this.clickItemHandler(item)}
+          onClick={(e) => this.clickItemHandler(e, item)}
         >
           {item.data}
         </button>
@@ -29,9 +34,41 @@ class List extends Component {
     ));
   }
 
-  clickItemHandler(item) {
+  clickItemHandler(e, item) {
     const { onSelect } = this.props;
-    if (onSelect) onSelect([item]);
+
+    if (e.shiftKey)
+      this.setState(
+        { selected: this.selectTo(item) },
+        this.reciveSelectedItems
+      );
+    else this.setState({ selected: [item] }, this.reciveSelectedItems);
+    //console.log(e.shiftKey);
+  }
+
+  reciveSelectedItems() {
+    const { onSelect } = this.props;
+    if (onSelect) onSelect(this.state.selected);
+  }
+
+  selectTo(item) {
+    const { items } = this.props;
+    const { selected } = this.state;
+    if (selected.length === 0) return [item];
+
+    const keysItems = items.map((item) => item.key);
+    let firstElementIndex = keysItems.indexOf(selected[0].key);
+    let secondElementIndex = keysItems.indexOf(item.key);
+
+    if (firstElementIndex > secondElementIndex)
+      [secondElementIndex, firstElementIndex] = [
+        firstElementIndex,
+        secondElementIndex,
+      ];
+
+    return secondElementIndex === items.length - 1
+      ? items.slice(firstElementIndex)
+      : items.slice(firstElementIndex, secondElementIndex + 1);
   }
 }
 
